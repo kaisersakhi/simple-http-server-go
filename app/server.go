@@ -56,6 +56,8 @@ func handleClient(client net.Conn) {
 
 	if headers["route"] == "/" {
 		client.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+	} else if headers["route"] == "/echo/abc" {
+		client.Write([]byte("HTTP/1.1 200 OK\r\n\r\nabc\r\n"))
 	} else {
 		client.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 	}
