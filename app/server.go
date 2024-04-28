@@ -20,13 +20,15 @@ func main() {
 	}
 	defer l.Close()
 
-	client, err := l.Accept()
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
-	}
+	for {
+		client, err := l.Accept()
+		if err != nil {
+			fmt.Println("Error accepting connection: ", err.Error())
+			os.Exit(1)
+		}
 
-	handleClient(client)
+		go handleClient(client)
+	}
 }
 
 func handleClient(client net.Conn) {
@@ -37,7 +39,8 @@ func handleClient(client net.Conn) {
 	headers := make(map[string]string)
 
 	line, _ := reader.ReadString('\n')
-
+	fmt.Println("Requet headers....")
+	fmt.Println(line)
 	parts := strings.Split(line, " ")
 
 	headers["action"] = parts[0]
