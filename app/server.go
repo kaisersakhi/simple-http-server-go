@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 )
+
+var filePath = ""
 
 func main() {
 	fmt.Println("Logs from your program will appear here!")
@@ -20,6 +23,10 @@ func main() {
 	}
 
 	defer l.Close()
+
+	if len(os.Args) > 2  && os.Args[1] == "--directory"{
+		filePath = os.Args[2]
+	}
 
 	for {
 		client, err := l.Accept()
@@ -82,6 +89,18 @@ func handleClient(client net.Conn) {
 		responseMap["status_code"] = "200"
 		responseMap["body"] = headers["User-Agent:"]
 
+		client.Write(buildResponse(responseMap))
+	} else if matchRoute(route, "\\/files\\/.+") {
+		fmt.Println("file path...")
+
+		fileContent, err := os.ReadFile(filePath)
+
+		if err != nil || filepath.Base(filePath) != strings.SplitAfter(route, "/files/")[1] {
+			responseMap["status_code"] = "404"
+		} else {
+			responseMap["status_code"] = "200"
+			responseMap["body"] = string(fileContent)
+		}
 		client.Write(buildResponse(responseMap))
 	} else {
 		fmt.Println("404 route")
