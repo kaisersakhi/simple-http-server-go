@@ -91,13 +91,13 @@ func buildResponse(responseMap map[string]string) []byte{
 	var response strings.Builder
 
 	if responseMap["status_code"] == "200" {
-		response.WriteString("HTTP/1.1 200 OK\r\n\r\n")
+		response.WriteString("HTTP/1.1 200 OK\r\n")
 	} else if responseMap["status_code"] == "404" {
-		response.WriteString("HTTP/1.1 404 Not Found\r\n\r\n")
+		response.WriteString("HTTP/1.1 404 Not Found\r\n")
 	}
 
 	if  responseMap["body"] != "" {
-		response.WriteString("Content-Type: text/plain \r\n\r\n")
+		response.WriteString("Content-Type: text/plain \r\n")
 		response.WriteString("Content-Length: " + strconv.Itoa(len([]byte(responseMap["body"]))) + " \r\n\r\n")
 		response.WriteString(responseMap["body"])
 
