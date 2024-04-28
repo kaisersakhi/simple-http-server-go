@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
-var filePath = ""
+var directory = ""
 
 func main() {
 	fmt.Println("Logs from your program will appear here!")
@@ -25,7 +24,7 @@ func main() {
 	defer l.Close()
 
 	if len(os.Args) > 2  && os.Args[1] == "--directory"{
-		filePath = os.Args[2]
+		directory = os.Args[2]
 	}
 
 	for {
@@ -93,13 +92,14 @@ func handleClient(client net.Conn) {
 	} else if matchRoute(route, "\\/files\\/.+") {
 		fmt.Println("file path...")
 
-		fileContent, err := os.ReadFile(filePath)
+		fileName := strings.SplitAfter(route, "/files/")[1]
+		fileContent, err := fileContentIn(directory, fileName)
 
-		if err != nil || filepath.Base(filePath) != strings.SplitAfter(route, "/files/")[1] {
+		if err != nil {
 			responseMap["status_code"] = "404"
 		} else {
 			responseMap["status_code"] = "200"
-			responseMap["body"] = string(fileContent)
+			responseMap["body"] = fileContent
 		}
 		client.Write(buildResponse(responseMap))
 	} else {
@@ -141,4 +141,14 @@ func buildResponse(responseMap map[string]string) []byte{
 	fmt.Println(response.String())
 
 	return []byte(response.String())
+}
+
+func fileContentIn(directory string, fileName string) (string, error) {
+	fileContent, err := os.ReadFile(directory + "/" + fileName)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(fileContent), nil
 }
