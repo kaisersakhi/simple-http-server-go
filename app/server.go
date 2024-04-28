@@ -49,7 +49,7 @@ func handleClient(client net.Conn) {
 
 		if err != nil || line != "\r\n" {
 			parts = strings.Split(line, " ")
-			headers[parts[0]] = parts[1]
+			headers[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
 			fmt.Printf("%v  %v\n", parts[0], headers[parts[0]])
 		} else {
 			break
@@ -68,6 +68,13 @@ func handleClient(client net.Conn) {
 		fmt.Println("echo route")
 		responseMap["status_code"] = "200"
 		responseMap["body"] = strings.SplitAfter(route, "/echo/")[1]
+
+		client.Write(buildResponse(responseMap))
+	}else if matchRoute(route, "\\/user-agent"){
+		fmt.Println("user-agent route")
+
+		responseMap["status_code"] = "200"
+		responseMap["body"] = headers["User-Agent:"]
 
 		client.Write(buildResponse(responseMap))
 	} else {
@@ -105,7 +112,7 @@ func buildResponse(responseMap map[string]string) []byte{
 		response.WriteString("Content-Length: 0 \r\n\r\n")
 	}
 
-//	fmt.Println(string(len(responseMap["body"])))
+	fmt.Println(string(len(responseMap["body"])))
 	fmt.Println(response.String())
 
 	return []byte(response.String())
