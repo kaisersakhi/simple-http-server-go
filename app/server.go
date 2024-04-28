@@ -98,7 +98,7 @@ func buildResponse(responseMap map[string]string) []byte{
 
 	if  responseMap["body"] != "" {
 		response.WriteString("Content-Length: " + strconv.Itoa(len([]byte(responseMap["body"]))) + " \r\n\r\n")
-		response.WriteString("Content-Type: text/html\r\n\r\n")
+		response.WriteString("Content-Type: text/plain\r\n\r\n")
 		response.WriteString(responseMap["body"])
 
 	}
