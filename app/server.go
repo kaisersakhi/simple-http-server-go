@@ -18,6 +18,7 @@ func main() {
 		fmt.Println("Failed to bind to port 4221")
 		os.Exit(1)
 	}
+
 	defer l.Close()
 
 	for {
@@ -39,8 +40,10 @@ func handleClient(client net.Conn) {
 	headers := make(map[string]string)
 
 	line, _ := reader.ReadString('\n')
+
 	fmt.Println("Requet headers....")
 	fmt.Println(line)
+
 	parts := strings.Split(line, " ")
 
 	headers["action"] = parts[0]
