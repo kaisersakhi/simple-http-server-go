@@ -101,6 +101,8 @@ func buildResponse(responseMap map[string]string) []byte{
 		response.WriteString("Content-Length: " + strconv.Itoa(len([]byte(responseMap["body"]))) + " \r\n\r\n")
 		response.WriteString(responseMap["body"])
 
+	} else {
+		response.WriteString("Content-Length: 0 \r\n\r\n")
 	}
 
 //	fmt.Println(string(len(responseMap["body"])))
