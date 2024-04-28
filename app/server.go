@@ -100,6 +100,7 @@ func handleClient(client net.Conn) {
 		} else {
 			responseMap["status_code"] = "200"
 			responseMap["body"] = fileContent
+			responseMap["content_type"] = "application/octet-stream"
 		}
 		client.Write(buildResponse(responseMap))
 	} else {
@@ -121,6 +122,7 @@ func matchRoute(route string, rx string) bool {
 
 func buildResponse(responseMap map[string]string) []byte{
 	var response strings.Builder
+	var contentType string
 
 	if responseMap["status_code"] == "200" {
 		response.WriteString("HTTP/1.1 200 OK\r\n")
@@ -128,8 +130,15 @@ func buildResponse(responseMap map[string]string) []byte{
 		response.WriteString("HTTP/1.1 404 Not Found\r\n")
 	}
 
+
+	if responseMap["content_type"] != "" {
+		contentType = responseMap["content_type"]
+	} else {
+		contentType = "text/plain"
+	}
+
 	if  responseMap["body"] != "" {
-		response.WriteString("Content-Type: text/plain \r\n")
+		response.WriteString("Content-Type: "+ contentType +" \r\n")
 		response.WriteString("Content-Length: " + strconv.Itoa(len([]byte(responseMap["body"]))) + " \r\n\r\n")
 		response.WriteString(responseMap["body"])
 
