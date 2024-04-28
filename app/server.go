@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -54,11 +56,55 @@ func handleClient(client net.Conn) {
 		}
 	}
 
-	if headers["route"] == "/" {
-		client.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
-	} else if headers["route"] == "/echo/abc" {
-		client.Write([]byte("HTTP/1.1 200 OK\r\n\r\nabc\r\n"))
+	route := headers["route"]
+
+	responseMap := make(map[string]string)
+	if matchRoute(route, "/$") {
+		fmt.Println("Root route")
+		responseMap["status_code"] = "200"
+
+		client.Write(buildResponse(responseMap))
+	} else if matchRoute(route, "\\/echo\\/.+") {
+		fmt.Println("echo route")
+		responseMap["status_code"] = "200"
+		responseMap["body"] = strings.SplitAfter(route, "/echo/")[1]
+
+		client.Write(buildResponse(responseMap))
 	} else {
-		client.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+		fmt.Println("404 route")
+		responseMap["status_code"] = "404"
+
+		client.Write(buildResponse(responseMap))
 	}
+}
+
+func matchRoute(route string, rx string) bool {
+	regex, err := regexp.Compile(rx)
+
+	if err != nil {
+		return false
+	}
+	return regex.MatchString(route)
+}
+
+func buildResponse(responseMap map[string]string) []byte{
+	var response strings.Builder
+
+	if responseMap["status_code"] == "200" {
+		response.WriteString("HTTP/1.1 200 OK\r\n\r\n")
+	} else if responseMap["status_code"] == "404" {
+		response.WriteString("HTTP/1.1 404 Not Found\r\n\r\n")
+	}
+
+	if  responseMap["body"] != "" {
+		response.WriteString("Content-Length: " + strconv.Itoa(len([]byte(responseMap["body"]))) + " \r\n\r\n")
+		response.WriteString("Content-Type: text/html\r\n\r\n")
+		response.WriteString(responseMap["body"])
+
+	}
+
+//	fmt.Println(string(len(responseMap["body"])))
+	fmt.Println(response.String())
+
+	return []byte(response.String())
 }
