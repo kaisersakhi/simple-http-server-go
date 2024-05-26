@@ -40,6 +40,7 @@ func main() {
 		if err != nil {
 			res.ResourceNotFound("File requested not found.")
 		} else {
+			res.ContentType(ApplicationOctetStream)
 			res.WriteBody(fileContent)
 		}
 	})
