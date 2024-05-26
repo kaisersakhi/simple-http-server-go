@@ -52,7 +52,7 @@ func (s *SimpleServer) Listen() {
 	listener, err := net.Listen("tcp", sockAddress)
 
 	if err != nil {
-		fmt.Printf("Failed on start TCP server: %s", sockAddress)
+		fmt.Printf("Failed on start TCP server: %s %s", sockAddress, err)
 		os.Exit(1)
 	}
 

@@ -10,7 +10,7 @@ import (
 var directory string
 
 func main() {
-	server := NewServer("0.0.0.0", "4242")
+	server := NewServer("0.0.0.0", "4221")
 	// Get directory path.
 	if len(os.Args) > 2 && os.Args[1] == "--directory" {
 		directory = os.Args[2]
