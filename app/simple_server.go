@@ -12,36 +12,38 @@ import (
 type transaction func(*Request, *Response)
 
 type route struct {
-	method   string
-	callback transaction
+	routeRx string
+	method  string
 }
 
 type SimpleServer struct {
 	ip           string
 	port         string
-	routingTable map[string]route
+	routingTable map[route]transaction
 }
 
 func NewServer(ip string, port string) *SimpleServer {
 	return &SimpleServer{
 		ip:           ip,
 		port:         port,
-		routingTable: make(map[string]route),
+		routingTable: make(map[route]transaction),
 	}
 }
 
 func (s *SimpleServer) RegisterRoute(method string, routeRx string, transaction func(request *Request, response *Response)) {
-	s.routingTable[routeRx] = route{
-		method:   method,
-		callback: transaction,
+	route := route{
+		routeRx: routeRx,
+		method:  method,
 	}
+	s.routingTable[route] = transaction
 }
 
 func (s *SimpleServer) Register404(transaction func(request *Request, response *Response)) {
-	s.routingTable["404"] = route{
-		method:   "get",
-		callback: transaction,
+	route := route{
+		routeRx: "\\/404",
+		method:  "get",
 	}
+	s.routingTable[route] = transaction
 }
 
 func (s *SimpleServer) Listen() {
@@ -76,9 +78,9 @@ func handleClient(server *SimpleServer, client net.Conn) {
 	request := PrepareRequest(bufio.NewReader(client))
 	response := NewResponse()
 
-	for key, value := range server.routingTable {
-		if matchRoute(request.route, key) && strings.EqualFold(value.method, request.method) {
-			value.callback(request, response)
+	for kRoute, vTransaction := range server.routingTable {
+		if matchRoute(request.route, kRoute.routeRx) && strings.EqualFold(kRoute.method, request.method) {
+			vTransaction(request, response)
 
 			client.Write(response.PrepareRaw())
 
@@ -88,7 +90,7 @@ func handleClient(server *SimpleServer, client net.Conn) {
 
 	// Call 404 callback.
 
-	response.Status(NotFound)
+	response.ResourceNotFound("The resource you're looking for is not found.", "Requested resource : "+request.route)
 
 	client.Write(response.PrepareRaw())
 }

@@ -55,10 +55,13 @@ func (r *Response) ContentType(contentType string) {
 	r.contentType = contentType
 }
 
-func (r *Response) ResourceNotFound() {
+func (r *Response) ResourceNotFound(reasons ...string) {
+	if len(reasons) == 0 {
+		r.WriteBody("Resource not found.")
+	} else {
+		r.WriteBody(strings.Join(reasons, "\n"))
+	}
 	r.status = NotFound
-	r.contentLength = 0
-	r.body = ""
 }
 
 func (r *Response) PrepareRaw() []byte {

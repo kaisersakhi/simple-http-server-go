@@ -24,8 +24,12 @@ func main() {
 		res.WriteBody(req.userAgent)
 	})
 
-	server.RegisterRoute("get", "\\files\\/.+", func(req *Request, res *Response){
-		
+	server.RegisterRoute("get", "\\/files\\/.+", func(req *Request, res *Response) {
+		res.ResourceNotFound()
+	})
+
+	server.RegisterRoute("post", "\\/files\\/.+", func(req *Request, res *Response) {
+
 	})
 
 	server.Listen()
