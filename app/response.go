@@ -7,12 +7,13 @@ import (
 )
 
 const (
-	Continue     = 100
-	Ok           = 200
-	Created      = 201
-	BadRequest   = 400
-	Unauthorized = 401
-	NotFound     = 404
+	Continue            = 100
+	Ok                  = 200
+	Created             = 201
+	BadRequest          = 400
+	Unauthorized        = 401
+	NotFound            = 404
+	UnprocessableEntity = 422
 )
 
 const (
@@ -109,6 +110,8 @@ func reasonPhrase(statusCode int) string {
 		return "Unauthorized"
 	case 404:
 		return "Not Found"
+	case 422:
+		return "Unprocessable Entity"
 	default:
 		return ""
 	}
