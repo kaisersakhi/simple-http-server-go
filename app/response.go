@@ -31,9 +31,10 @@ type Response struct {
 }
 
 func NewResponse() *Response {
+	// Return response object with default values.
 	return &Response{
 		httpVersion:   "1.1",
-		status:        200,
+		status:        Ok,
 		contentType:   TextPlain,
 		date:          "",
 		contentLength: 0,
@@ -47,11 +48,17 @@ func (r *Response) WriteBody(content string) {
 }
 
 func (r *Response) Status(status int) {
-	r.status = r.status
+	r.status = status
 }
 
 func (r *Response) ContentType(contentType string) {
 	r.contentType = contentType
+}
+
+func (r *Response) ResourceNotFound() {
+	r.status = NotFound
+	r.contentLength = 0
+	r.body = ""
 }
 
 func (r *Response) PrepareRaw() []byte {

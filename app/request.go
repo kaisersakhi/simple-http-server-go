@@ -32,6 +32,8 @@ func PrepareRequest(reader *bufio.Reader) *Request {
 		method:        parsedheaders["method"],
 		httpVersion:   parsedheaders["version"],
 		route:         parsedheaders["route"],
+		host:          parsedheaders["Host:"],
+		userAgent:     parsedheaders["User-Agent:"],
 	}
 }
 

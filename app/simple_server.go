@@ -86,6 +86,8 @@ func handleClient(server *SimpleServer, client net.Conn) {
 		}
 	}
 
+	// Call 404 callback.
+
 	response.Status(NotFound)
 
 	client.Write(response.PrepareRaw())
